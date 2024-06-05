@@ -34104,7 +34104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHP: 0
   rb: {fileID: 0}
-  maxSpeed: 20
+  maxSpeed: 10
   acceleration: 20
 --- !u!114 &2080746205189096973
 MonoBehaviour:
