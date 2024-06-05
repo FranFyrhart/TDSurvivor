@@ -19,8 +19,7 @@ public class PlayerMovement : CombatHandler
     #region variables
     private float horizontalInputValue;
     private float verticalInputValue;
-    private float finalHorizontalInputValue;
-    private float finalVerticalInputValue;
+    private const float gravity = -9.81f;
     #endregion
 
     #region Unity Messages
@@ -32,6 +31,15 @@ public class PlayerMovement : CombatHandler
 
     private void FixedUpdate()
     {
+        MovePlayerCharacter();
+    }
+
+    #endregion
+
+    #region methods
+
+    private void MovePlayerCharacter()
+    {
         Vector3 inputDirection = new Vector3(horizontalInputValue, 0, verticalInputValue).normalized;
 
         float currentSpeed = Mathf.Min(velocity.magnitude + acceleration * Time.fixedDeltaTime, maxSpeed);
@@ -39,13 +47,8 @@ public class PlayerMovement : CombatHandler
 
         velocity = Vector3.MoveTowards(velocity, targetVelocity, acceleration * Time.fixedDeltaTime);
 
-        controller.Move(velocity * Time.fixedDeltaTime);
+        controller.SimpleMove(velocity * Time.fixedDeltaTime);
     }
-
-    #endregion
-
-    #region methods
-
     #endregion
 
     #region controls 
