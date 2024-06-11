@@ -54,10 +54,7 @@ public class Tower : MonoBehaviour
         if (targetsInRange.Count == 0)
             return;
 
-        currentTarget = targetsInRange.Aggregate((minItem, nextItem) =>
-            Vector3.Distance(minItem.position, transform.position) < Vector3.Distance(nextItem.position, transform.position) ? minItem : nextItem);
-
-        if (currentTarget == null)
+        if (currentTarget != null)
             return;
 
         Vector3 targetPosition = currentTarget.transform.position;
@@ -86,8 +83,9 @@ public class Tower : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Adding target");
+
         targetsInRange.Add(other.transform);
-        //if (other.CompareTag(StringConstants.Tags.enemyTag))
+        currentTarget = targetsInRange.OrderBy(target => Vector3.Distance(target.position, transform.position)).FirstOrDefault();
     }
 
     private void OnTriggerExit(Collider other)
