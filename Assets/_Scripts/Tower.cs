@@ -10,7 +10,6 @@ public class Tower : MonoBehaviour
     [SerializeField] private float attackRange = 5f;
     [SerializeField] private int towerDamage = 100;
     [SerializeField] private float rateOfFire = 1f;
-    [SerializeField] private List<Collider> targetCollidersHit;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private Transform connectionPoint;
 
@@ -18,6 +17,7 @@ public class Tower : MonoBehaviour
     [SerializeField] protected Transform projectileSpawnPoint;
     [SerializeField] protected Transform turretPivot;
     
+    private List<Collider> targetCollidersHit;
     private bool _towerDeactivated = true, attackCoroutineRunning = false;
     private Transform _player;
     private Transform currentTarget;
@@ -46,21 +46,19 @@ public class Tower : MonoBehaviour
 
     private void Update()
     {
-        if (_player == null)
-            return;
-
-        Debug.DrawRay(transform.position, _player.transform.position - transform.position, Color.green);
-
         if (targetsInRange.Count == 0)
             return;
 
-        if (currentTarget != null)
+        if (currentTarget == null)
+        { 
+            Debug.LogWarning("Current target is null");
             return;
+        }
 
         Vector3 targetPosition = currentTarget.transform.position;
-        targetPosition.y = turretPivot.position.y; // Keep the same height as the turretPivot
-        turretPivot.LookAt(targetPosition);
-        //Attack();
+        Debug.Log("Looking at target");
+        Quaternion targetRotation = Quaternion.LookRotation(targetPosition - turretPivot.position, Vector3.up);
+        turretPivot.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
     }
 
     private void Attack()
