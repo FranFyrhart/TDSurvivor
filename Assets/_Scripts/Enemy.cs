@@ -33,6 +33,9 @@ public class Enemy : CombatHandler
 
     private void Update()
     {
+        if(playerTransform == null) 
+            return;
+
         meshAgent.SetDestination(playerTransform.position);
         if (meshAgent.remainingDistance < attackRange && attackCooldownDone)
         {
