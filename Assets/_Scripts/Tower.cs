@@ -91,8 +91,13 @@ public class Tower : MonoBehaviour
         // Get the rigidbody component of the projectile
         Rigidbody rb = newProjectile.ProjectileRB;
 
-        // Set the velocity of the projectile to the enemy's forward direction multiplied by the speed factor
-        rb.velocity = projectileSpawnPoint.forward * newProjectile.ProjectileSpeed;
+        Vector3 targetDirection = currentTarget.transform.position - projectileSpawnPoint.position;
+        targetDirection.Normalize();
+        Quaternion projectileRotation = Quaternion.LookRotation(targetDirection);
+
+        // Set the velocity of the projectile towards the target
+        rb.velocity = targetDirection * newProjectile.ProjectileSpeed;
+        rb.transform.rotation = Quaternion.Slerp(rb.transform.rotation, projectileRotation, 0.1f);
 
         StartCoroutine(CooldownAttack());
         
