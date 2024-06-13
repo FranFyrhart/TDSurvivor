@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.ProBuilder;
 
 public class Tower : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Tower : MonoBehaviour
     [SerializeField] private float rateOfFire = 1f;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private Transform connectionPoint;
+    [SerializeField] private GameObject projectile;
 
     [Space]
     [SerializeField] protected Transform projectileSpawnPoint;
@@ -23,6 +25,8 @@ public class Tower : MonoBehaviour
     private Transform currentTarget;
     private IEnumerator attackCoroutine;
     protected List<Transform> targetsInRange = new();
+    private bool attackCooldownDone = true;
+    private float currentCooldown;
 
     public Transform Player { set { _player = value; } }
 
@@ -50,32 +54,59 @@ public class Tower : MonoBehaviour
             return;
 
         if (currentTarget == null)
-        { 
-            Debug.LogWarning("Current target is null");
+            return;
+
+        Vector3 targetPosition = currentTarget.transform.position;
+        Quaternion targetRotation = Quaternion.LookRotation(targetPosition - turretPivot.position, Vector3.up);
+        turretPivot.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
+        
+        if (!attackCooldownDone)
+        {
+            Debug.Log("attack cooldown not done");
             return;
         }
 
-        Vector3 targetPosition = currentTarget.transform.position;
-        Debug.Log("Looking at target");
-        Quaternion targetRotation = Quaternion.LookRotation(targetPosition - turretPivot.position, Vector3.up);
-        turretPivot.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
+        if (targetsInRange.Count == 0)
+        {
+            Debug.LogWarning("no targets in range");
+            return;
+        }
+
+        if (currentTarget == null)
+        {
+            Debug.LogWarning("No target");
+            return;
+        }
+
+        Attack();
     }
 
     private void Attack()
     {
-        //targetCollidersHit = Physics.OverlapCapsule(transform.position, _player.position, 1f, enemyLayer).ToList();
+        attackCooldownDone = false;
+        currentCooldown = 1f / rateOfFire;
 
-        targetCollidersHit = Physics.OverlapSphere(transform.position, attackRange, enemyLayer).ToList();
+        Projectile newProjectile = Instantiate(projectile, projectileSpawnPoint.position, transform.rotation).GetComponent<Projectile>();
+        //Debug.Log($"Intended spawn position: {transform.position}");
+        // Get the rigidbody component of the projectile
+        Rigidbody rb = newProjectile.ProjectileRB;
 
-        if (targetCollidersHit.Count == 0) return;
+        // Set the velocity of the projectile to the enemy's forward direction multiplied by the speed factor
+        rb.velocity = projectileSpawnPoint.forward * newProjectile.ProjectileSpeed;
 
-        //for each overlap capsule, flash the material of the target
-        //for (int j = 0; j < targetCollidersHit.Count; j++)
-        //{
-        //    Enemy enemy = targetCollidersHit[j].GetComponent<Enemy>();
-        //    if (enemy == null) continue;
-        //    enemy.TakeDamage(towerDamage);
-        //}
+        StartCoroutine(CooldownAttack());
+        
+        Debug.Log("Tower Attacking");
+
+        IEnumerator CooldownAttack()
+        {
+            while (currentCooldown > 0)
+            {
+                currentCooldown -= 0.01f;
+                yield return new WaitForSeconds(0.01f);
+            }
+            attackCooldownDone = true;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -111,7 +142,7 @@ public class Tower : MonoBehaviour
                 currentCooldown -= 0.1f;
                 yield return new WaitForSeconds(0.1f);
             }
-            Attack();
+            //Attack();
         }
     }
 
