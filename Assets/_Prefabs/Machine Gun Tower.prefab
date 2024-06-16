@@ -1686,11 +1686,11 @@ MonoBehaviour:
   attackRange: 5
   towerDamage: 100
   rateOfFire: 1
-  targetCollidersHit: []
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
   connectionPoint: {fileID: 0}
+  projectile: {fileID: 4601544168382118116, guid: 7bc4575c63f05d648a6bf74936fd4588, type: 3}
   projectileSpawnPoint: {fileID: 7898921062359999146}
   turretPivot: {fileID: 3337053929257451867}
 --- !u!135 &5827016774442991289
