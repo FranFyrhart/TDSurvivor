@@ -61,22 +61,13 @@ public class Tower : MonoBehaviour
         turretPivot.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
         
         if (!attackCooldownDone)
-        {
-            Debug.Log("attack cooldown not done");
             return;
-        }
 
         if (targetsInRange.Count == 0)
-        {
-            Debug.LogWarning("no targets in range");
             return;
-        }
 
         if (currentTarget == null)
-        {
-            Debug.LogWarning("No target");
             return;
-        }
 
         Attack();
     }
@@ -97,7 +88,7 @@ public class Tower : MonoBehaviour
 
         // Set the velocity of the projectile towards the target
         rb.velocity = targetDirection * newProjectile.ProjectileSpeed;
-        rb.transform.rotation = Quaternion.Slerp(rb.transform.rotation, projectileRotation, 0.1f);
+        newProjectile.transform.rotation = Quaternion.Slerp(newProjectile.transform.rotation, projectileRotation, 0.1f);
 
         StartCoroutine(CooldownAttack());
         
