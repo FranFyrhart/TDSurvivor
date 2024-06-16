@@ -14,9 +14,8 @@ public class Projectile : MonoBehaviour
     [SerializeField] private Rigidbody projectileRB;
     [SerializeField] private float projectileSpeed = 2f;
     [SerializeField, Tooltip("Projectile lifetime in seconds")] float lifetime = 1.5f;
-    [SerializeField] private string targetTag;
 
-    float currentLifetime;
+    private float currentLifetime;
 
     private void Start() {
         //Debug.Log($"Projectile Spawn position: {transform.position}");
@@ -30,7 +29,8 @@ public class Projectile : MonoBehaviour
             currentLifetime -= 0.01f;
             yield return new WaitForSeconds(0.01f);
         }
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 
     public float ProjectileSpeed { get { return projectileSpeed; } }
@@ -38,17 +38,19 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other) 
     {
-        if (other.gameObject.layer == 6) {
-            StopCoroutine(StartLifetimeCountdown());
-            Destroy(gameObject);
-            return;
-        }
+        Debug.Log($"{gameObject.name} collided with: {other.gameObject.name} ");
+        //if (other.gameObject.layer == 6) {
+        //    StopCoroutine(StartLifetimeCountdown());
+        //    Destroy(gameObject);
+        //    return;
+        //}
 
-        if (!other.gameObject.CompareTag(targetTag)) return;
-        
-        CombatHandler enemyHit = other.gameObject.GetComponent<CombatHandler>();
-        enemyHit.TakeDamage(damage); 
+        //if (!other.gameObject.CompareTag(StringConstants.Tags.enemyTag) || !other.gameObject.CompareTag(StringConstants.Tags.playerTag)) return;
+
+        if (other.gameObject.TryGetComponent<CombatHandler>(out CombatHandler targetHit)) 
+            targetHit.TakeDamage(damage); 
 
         Destroy(gameObject);
+        StopAllCoroutines();
     }
 }
