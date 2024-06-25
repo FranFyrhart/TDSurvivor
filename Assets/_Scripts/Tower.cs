@@ -27,6 +27,7 @@ public class Tower : MonoBehaviour
     protected List<Transform> targetsInRange = new();
     private bool attackCooldownDone = true;
     private float currentCooldown;
+    private CombatHandler currentTargetCombatHandler;
 
     public Transform Player { set { _player = value; } }
 
@@ -67,6 +68,9 @@ public class Tower : MonoBehaviour
             return;
 
         if (currentTarget == null)
+            return;
+
+        if (currentTargetCombatHandler.GetCurrentHP() == 0)
             return;
 
         Attack();
@@ -111,6 +115,7 @@ public class Tower : MonoBehaviour
 
         targetsInRange.Add(other.transform);
         currentTarget = targetsInRange.OrderBy(target => Vector3.Distance(target.position, transform.position)).FirstOrDefault();
+        currentTargetCombatHandler = currentTarget.GetComponent<CombatHandler>();
     }
 
     private void OnTriggerExit(Collider other)
